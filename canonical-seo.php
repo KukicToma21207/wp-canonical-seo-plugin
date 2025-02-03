@@ -5,7 +5,7 @@ Description: Customizable canonical URL and meta description per page
 Version: 1.0.0
 Author: Riznica Poklona
 Author URI: https://riznicapoklona.com
-License: GPLv2
+License: GPLv3
 */
 
 

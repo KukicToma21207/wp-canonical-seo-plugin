@@ -1,11 +1,13 @@
 <?php
 
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+
 /**
- * CanonicalSeo class
+ * Canonical_Seo class
  * 
  * Main class of the plugin responsible for the main logics
  */
-class CanonicalSeo
+class Canonical_Seo
 {
 
     /**
@@ -21,20 +23,23 @@ class CanonicalSeo
     {
         add_action('add_meta_boxes', [$this, 'register_metaboxes']);
         add_action('save_post', [$this, 'save_metaboxes']);
+
+        //Write custom meta tags
         add_action('wp_head', [$this, 'display_data_on_page']);
 
+        //Write custom canonical url
         add_filter("get_canonical_url", [$this, 'apply_custom_canonical_url'], 10, 2);
     }
 
 
     /**
-     * @return CanonicalSeo instance Singleton instance for the class
+     * @return Canonical_Seo instance Singleton instance for the class
      */
-    public static function instance(): CanonicalSeo
+    public static function instance(): Canonical_Seo
     {
 
         if (!self::$instance) {
-            self::$instance = new CanonicalSeo();
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -95,7 +100,7 @@ class CanonicalSeo
 
 ?>
         <label for="cseo_canonical_url">
-            <?php echo esc_html('Enter canonical URL used by Google bot for SEO'); ?>
+            <?php echo esc_html('Customize canonical URL'); ?>
         </label>
         <input style="width: 100%;" type="text" id="cseo_canonical_url" name="cseo_canonical_url" value="<?php echo esc_attr($value); ?>" />
     <?php
@@ -112,7 +117,7 @@ class CanonicalSeo
 
     ?>
         <label for="cseo_meta_description">
-            <?php echo esc_html('Enter meta tag "description"'); ?>
+            <?php echo esc_html('Write meta tag "description"'); ?>
         </label>
         <input style="width: 100%;" type="text" id="cseo_meta_description" name="cseo_meta_description" value="<?php echo esc_attr($value); ?>" />
     <?php
@@ -155,6 +160,8 @@ class CanonicalSeo
 
             // Update the meta field.
             update_post_meta($post_id, '_cseo_canonical_url', $mydataCanUrl);
+        } else {
+            delete_post_meta($post_id, '_cseo_canonical_url');
         }
 
         if (!empty($_POST['cseo_meta_description'])) {
@@ -164,6 +171,8 @@ class CanonicalSeo
 
             // Update the meta field.
             update_post_meta($post_id, '_cseo_meta_description', $mydataMetaDesc);
+        } else {
+            delete_post_meta($post_id, '_cseo_meta_description');
         }
     }
 
@@ -196,7 +205,7 @@ class CanonicalSeo
         $canonicalURL = get_post_meta($post->ID, '_cseo_canonical_url', true);
 
         if (!$canonicalURL || trim($canonicalURL) == "") {
-            return $value;
+            return $result;
         }
 
         //Apply our custom canonical url
@@ -209,4 +218,4 @@ class CanonicalSeo
 /**
  * Let's initiate everything now!
  */
-add_action('plugin_loaded', ['CanonicalSeo', 'instance'], 30, 1);
+add_action('plugin_loaded', ['Canonical_Seo', 'instance'], 30, 1);
